@@ -25,19 +25,6 @@ def auto_loc_lookup():
   except urllib2.URLError:
     return False
 
-def get_image(loc):
-  try:
-    image = {}
-    location = loc.split(',');
-    url = 'http://forecast.io/atlas/precipitation.png?latitude=' +  location[0] + '&longitude=' +  location[1] + '&theta=0&phi=-30&zoom=0.05&width=320&height=213&border_scale=0.75&label_stroke_col=FFFFFFCC&label_scale=1&label_count=2&city_label=1'
-    opener = urllib2.build_opener()
-    opener.addheaders = [('Referer', 'http://forecast.io/atlas/')]
-    image['url'] = url
-    image['encoded'] = base64.b64encode(opener.open(url).read())
-    return image
-  except urllib2.URLError:
-    return False
-
 def full_country_name(country):
   try:
     countries = json.load(urllib2.urlopen('http://country.io/names.json'))
@@ -163,7 +150,6 @@ def get_wx():
 
     if 'loc' in location:
       weather_data['loc'] = str(location['loc'])
-      weather_data['image'] = get_image(location['loc']);
 
   except KeyError:
     return False
@@ -206,12 +192,6 @@ def render_wx():
   if 'next_hour' in weather_data:
     print weather_data['next_hour']
     print '---'
-
-  if 'image' in weather_data:
-    if weather_data['image']['encoded']:
-      print '| href=' + weather_data['image']['url'] + '| image=' + weather_data['image']['encoded']
-
-  print '---'
 
   if 'week' in weather_data:
     print "\n".join(textwrap.wrap(weather_data['week'], 50))
