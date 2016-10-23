@@ -16,7 +16,7 @@ import base64
 from random import randint
 
 api_key = '' # get yours at https://darksky.net/dev/
-units = '' # set to si for metric, leave blank for imperial
+units = '' # set to si or ca for metric, leave blank for imperial. more details on https://darksky.net/dev/docs/forecast
 
 def auto_loc_lookup():
   try:
@@ -90,13 +90,17 @@ def get_wx():
     return False
 
   if units == 'si':
-    unit = 'C'
-    distance = 'm/s'
-    distance_short = 'km'
+    temp_unit = 'C'
+    speed_unit = 'm/s'
+    distance_unit = 'km'
+  elif units == 'ca':
+    temp_unit = 'C'
+    speed_unit = 'km/h'
+    distance_unit = 'km'
   else:
-    unit = 'F'
-    distance = 'mph'
-    distance_short = 'mi'
+    temp_unit = 'F'
+    speed_unit = 'mph'
+    distance_unit = 'mi'
 
   try:
 
@@ -105,25 +109,25 @@ def get_wx():
     if 'currently' in wx:
       for item in wx['currently']:
         if item == 'temperature':
-          weather_data['temperature'] = str(int(round(wx['currently']['temperature']))) + '°' + unit
+          weather_data['temperature'] = str(int(round(wx['currently']['temperature']))) + '°' + temp_unit
         elif item == 'icon':
           weather_data['icon'] = get_wx_icon(str(wx['currently']['icon']))
         elif item == 'summary':
           weather_data['condition'] = str(wx['currently']['summary'].encode('utf-8'))
         elif item == 'windSpeed':
-          weather_data['wind'] = str(wx['currently']['windSpeed']) + ' ' + distance
+          weather_data['wind'] = str(wx['currently']['windSpeed']) + ' ' + speed_unit
         elif item == 'windBearing':
           weather_data['windBearing'] = calculate_bearing(wx['currently']['windBearing'])
         elif item == 'humidity':
           weather_data['humidity'] = str(int(round(wx['currently']['humidity'] * 100))) + '%'
         elif item == 'dewPoint':
-          weather_data['dewPoint'] = str(wx['currently']['dewPoint'])
+          weather_data['dewPoint'] = str(wx['currently']['dewPoint']) + '°' + temp_unit
         elif item == 'visibility':
-          weather_data['visibility'] = str(int(round(wx['currently']['visibility']))) + ' ' + distance_short
+          weather_data['visibility'] = str(int(round(wx['currently']['visibility']))) + ' ' + distance_unit
         elif item == 'pressure':
           weather_data['pressure'] = str(wx['currently']['pressure']) + ' mb'
         elif item == 'apparentTemperature':
-          weather_data['feels_like'] = str(int(round(wx['currently']['apparentTemperature']))) + '°' + unit
+          weather_data['feels_like'] = str(int(round(wx['currently']['apparentTemperature']))) + '°' + temp_unit
 
     if 'minutely' in wx:
       for item in wx['minutely']:
